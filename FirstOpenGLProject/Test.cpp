@@ -13,19 +13,20 @@ bool released = true;
 
 const char* vertexShaderSourse = "#version 330 core\n"
 	"layout (location = 0) in vec3 aPos;\n"
-	"out vec4 vertexColor;\n"
+	"layout (location = 1) in vec3 aColor;\n"
+	"out vec3 vertexColor;\n"
 	"void main()\n"
 	"{\n"
 	"	gl_Position = vec4(aPos, 1.0);\n"
-	"	vertexColor = vec4(gl_Position);\n"
+	"	vertexColor = aColor;\n"
 	"}\0";
 
 const char* orangeFragmentShaderSource = "#version 330 core\n"
 	"out vec4 FragColor;\n"
-	"in vec4 vertexColor;"
+	"in vec3 vertexColor;"
 	"void main()\n"
 	"{\n"
-	"	FragColor = vertexColor;\n"
+	"	FragColor = vec4(vertexColor, 1.0);\n"
 	"}\n\0";
 
 const char* yellowFragmentShaderSource = "#version 330 core\n"
@@ -145,16 +146,16 @@ int main()
 
 	float leftVerticies[] = {
 		// left triangle
-		-1.0, -0.5, 0.0f,  // left
-		0.0f, -0.5f, 0.0f, // right
-		-0.5f, 0.5f, 0.0f, // top 
+		-1.0,  -0.5,  0.0f, // left
+		 0.0f, -0.5f, 0.0f, // right
+		-0.5f,  0.5f, 0.0f  // top 
 	};
 
 	float rightVerticies[] = {
-		// right triangle
-		0.0f, -0.5f, 0.0f,  // left
-		1.0f, -.5f, 0.0f, // right
-		0.5f, 0.5f, 0.0f // top
+		// Positions        // Colors
+		0.0f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // left
+		1.0f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // right
+		0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f  // top
 	};
 
 	/*
@@ -204,8 +205,12 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBORight);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rightVerticies), rightVerticies, GL_STATIC_DRAW);
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// position attrubute 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

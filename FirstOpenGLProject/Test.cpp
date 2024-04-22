@@ -1,6 +1,7 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "shader_s.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void proccessInput(GLFWwindow* window);
@@ -11,34 +12,7 @@ const unsigned int SCR_HEIGHT = 600;
 bool wireframe = false;
 bool released = true;
 
-const char* vertexShaderSourse = "#version 330 core\n"
-	"layout (location = 0) in vec3 aPos;\n"
-	"layout (location = 1) in vec3 aColor;\n"
-	"out vec3 vertexColor;\n"
-	"void main()\n"
-	"{\n"
-	"	gl_Position = vec4(aPos, 1.0);\n"
-	"	vertexColor = aColor;\n"
-	"}\0";
-
-const char* orangeFragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"in vec3 vertexColor;"
-	"void main()\n"
-	"{\n"
-	"	FragColor = vec4(vertexColor, 1.0);\n"
-	"}\n\0";
-
-const char* yellowFragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"uniform vec4 ourColor;\n"
-	"void main()\n"
-	"{\n"
-	"	FragColor = ourColor;\n"
-	"}\n\0";
-
-
-int main() 
+int main()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -66,79 +40,9 @@ int main()
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
-
-
-	// Build and compiile the shaders
-	// ------------------------------
-	// Vertex Shader
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSourse, NULL);
-	glCompileShader(vertexShader);
-	// Check if the vertex shader compiled successfully
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shaders
-	// ----------------
-	// Orange fragment shader
-	unsigned int orangeFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(orangeFragmentShader, 1, &orangeFragmentShaderSource, NULL);
-	glCompileShader(orangeFragmentShader);
-	// Check if the orange fragment shader compiled successfully
-	glGetShaderiv(orangeFragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(orangeFragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::ORANGE_FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// Yellow fragment shaders
-	unsigned int yellowFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(yellowFragmentShader, 1, &yellowFragmentShaderSource, NULL);
-	glCompileShader(yellowFragmentShader);
-	// Check if the yellow fragment shader compiled successfully
-	glGetShaderiv(yellowFragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(yellowFragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::YELLOW_FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// link shaders
-	// ------------
-	// orange shader
-	unsigned int orangeShaderProgram = glCreateProgram();
-	glAttachShader(orangeShaderProgram, vertexShader);
-	glAttachShader(orangeShaderProgram, orangeFragmentShader);
-	glLinkProgram(orangeShaderProgram);
-	// Check if the shader program linked succesfully
-	glGetProgramiv(orangeShaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(orangeShaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::ORANGE_PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	// yellow shader
-	unsigned int yellowShaderProgram = glCreateProgram();
-	glAttachShader(yellowShaderProgram, vertexShader);
-	glAttachShader(yellowShaderProgram, yellowFragmentShader);
-	glLinkProgram(yellowShaderProgram);
-	// Check if the shader program linked succesfully
-	glGetProgramiv(yellowShaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(yellowShaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::YELLOW_PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-
-	// delete the shader objects
-	glDeleteShader(vertexShader);
-	glDeleteShader(orangeFragmentShader);
-	glDeleteShader(yellowFragmentShader);
-
+	// Create Shader Objects
+	Shader yellowShader("Shader.vert", "Orange.frag");
+	Shader orangeShader("Shader.vert", "Yellow.frag");
 
 	// Set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -172,6 +76,7 @@ int main()
 		1, 2, 3  // second triangle 
 	};
 	*/
+
 
 	unsigned int VBOLeft, VAOLeft, EBO, VBORight, VAORight;
 	glGenVertexArrays(1, &VAOLeft);
@@ -208,6 +113,7 @@ int main()
 	// position attrubute 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
 	// color attribute
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
@@ -232,24 +138,22 @@ int main()
 
 		// render
 		// ------
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		float vertexColorLocation = glGetUniformLocation(yellowShaderProgram, "ourColor");
-		glUseProgram(yellowShaderProgram);
-		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// set the shader program
-		glUseProgram(yellowShaderProgram);
-
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		orangeShader.use();
+		orangeShader.setFloat("ourColor", greenValue);
+		orangeShader.setFloat("offset", .1);
 		// bind and draw the left triangle 
 		glBindVertexArray(VAOLeft);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		glUseProgram(orangeShaderProgram);
-
+		yellowShader.use();
+		yellowShader.setFloat("offset", .1);
 		//bind and draw the right triangle
 		glBindVertexArray(VAORight);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -267,8 +171,6 @@ int main()
 	glDeleteVertexArrays(1, &VAORight);
 	glDeleteBuffers(1, &VBOLeft);
 	glDeleteBuffers(1, &VBORight);
-	glDeleteProgram(orangeShaderProgram);
-	glDeleteProgram(yellowShaderProgram);
 
 	// glfw: terminate, clearing all previousely allocated GLFW resources
 	// ------------------------------------------------------------------

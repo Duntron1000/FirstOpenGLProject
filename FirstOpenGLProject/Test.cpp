@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "shader_s.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "C:\Users\pjbru\OneDrive\Desktop\stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void proccessInput(GLFWwindow* window);
@@ -11,6 +13,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 bool wireframe = false;
 bool released = true;
+float mixer = 0.2;
 
 int main()
 {
@@ -41,87 +44,103 @@ int main()
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
 	// Create Shader Objects
-	Shader yellowShader("Shader.vert", "Orange.frag");
-	Shader orangeShader("Shader.vert", "Yellow.frag");
+	Shader yellowShader("Shader.vert", "Yellow.frag");
+	Shader orangeShader("Shader.vert", "Orange.frag");
 
 	// Set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	// triangle in Normalized Devize Coordinates
 
-	float leftVerticies[] = {
-		// left triangle
-		-1.0,  -0.5,  0.0f, // left
-		 0.0f, -0.5f, 0.0f, // right
-		-0.5f,  0.5f, 0.0f  // top 
-	};
 
-	float rightVerticies[] = {
-		// Positions        // Colors
-		0.0f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // left
-		1.0f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // right
-		0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f  // top
-	};
-
-	/*
 	// Rectangle using Element buffer object
 	float verticies[] = {
-		 0.5f,  0.5,  0.0f, // top right
-		 0.5f, -0.5f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, // bottom left
-		-0.5f,  0.5f, 0.0f  // top left
+		 // positions         // colors           // texture coords
+		 0.5f,  0.5,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
 	};
 
 	unsigned int indicies[] = {
 		0, 1, 3, // first triangle 
 		1, 2, 3  // second triangle 
 	};
-	*/
 
+	unsigned int VBO, VAO, EBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 
-	unsigned int VBOLeft, VAOLeft, EBO, VBORight, VAORight;
-	glGenVertexArrays(1, &VAOLeft);
-	glGenVertexArrays(1, &VAORight);
-	glGenBuffers(1, &VBOLeft);
-	glGenBuffers(1, &VBORight);
-	
-	//glGenBuffers(1, &EBO);
 	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attribure(s)
-	// Start setup for left Triangle 
-	glBindVertexArray(VAOLeft);
+	// Start setup 
+	glBindVertexArray(VAO);
 
 	// Bind VBO and send verticies to the graphics card 
-	glBindBuffer(GL_ARRAY_BUFFER, VBOLeft);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(leftVerticies), leftVerticies, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
 
 	// Bind EBO and send indicies to the graphics card
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
-	// tell opengl how to parse the data in the VBO
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// unbind the VBO, because the call to glVertexAttripPointer registered VBO as the vertex attributes bound vertex buffer object so afterwords we can safely unbind it 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Bind the VAO for the right triangle 
-	glBindVertexArray(VAORight);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBORight);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rightVerticies), rightVerticies, GL_STATIC_DRAW);
-	
-	// position attrubute 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// texture attribute 
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	// create texture object
+	unsigned int texture1, texture2;
+	glGenTextures(1, &texture1);
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// load the texture image
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texuture 1" << std::endl;
+	}
+	stbi_image_free(data);
+
+	// load the second texture
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// load the texture image
+	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texuture 2 " << std::endl;
+	}
+	stbi_image_free(data);
 
 
-
+	yellowShader.use();
+	yellowShader.setInt("texture1", 0);
+	yellowShader.setInt("texture2", 1);
 	// Draw loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -136,27 +155,21 @@ int main()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
+		yellowShader.setFloat("mixer", mixer);
+
 		// render
 		// ------
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		// set the shader program
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		orangeShader.use();
-		orangeShader.setFloat("ourColor", greenValue);
-		orangeShader.setFloat("offset", .1);
-		// bind and draw the left triangle 
-		glBindVertexArray(VAOLeft);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		yellowShader.use();
-		yellowShader.setFloat("offset", .1);
 		//bind and draw the right triangle
-		glBindVertexArray(VAORight);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
 
 		// glfw: swap buffers and poll IO events
@@ -167,10 +180,8 @@ int main()
 
 	// de-allocate all resources once they've outlived their purpose:
 	// --------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAOLeft);
-	glDeleteVertexArrays(1, &VAORight);
-	glDeleteBuffers(1, &VBOLeft);
-	glDeleteBuffers(1, &VBORight);
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 
 	// glfw: terminate, clearing all previousely allocated GLFW resources
 	// ------------------------------------------------------------------
@@ -193,5 +204,11 @@ void proccessInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
 		released = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		mixer += 0.01f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		mixer -= 0.01f;
 	}
 }

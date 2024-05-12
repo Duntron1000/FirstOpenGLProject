@@ -147,12 +147,17 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\OneDrive\Desktop\stb_image.h" />
     <ClInclude Include="shader_s.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.frag" />
     <None Include="Shader.vert" />
     <None Include="Yellow.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="awesomeface.png" />
+    <Image Include="container.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{ef4f2ffa-c06f-49d6-887c-78867d4914a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -23,19 +26,30 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Orange.frag">
-      <Filter>Source Files</Filter>
+    <None Include="Yellow.frag">
+      <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Shader.vert">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="Yellow.frag">
-      <Filter>Source Files</Filter>
+    <None Include="Orange.frag">
+      <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_s.h">
-      <Filter>Source Files</Filter>
+      <Filter>HeaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\OneDrive\Desktop\stb_image.h">
+      <Filter>HeaderFiles</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="awesomeface.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

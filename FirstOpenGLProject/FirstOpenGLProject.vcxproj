@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\OneDrive\Desktop\stb_image.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="shader_s.h" />
   </ItemGroup>
   <ItemGroup>

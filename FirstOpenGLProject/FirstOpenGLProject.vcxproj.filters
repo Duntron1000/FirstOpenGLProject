@@ -43,6 +43,9 @@
     <ClInclude Include="..\..\..\..\OneDrive\Desktop\stb_image.h">
       <Filter>HeaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>HeaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">

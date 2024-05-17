@@ -35,6 +35,18 @@
     <None Include="Orange.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="lighting.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="lightSource.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="lightSource.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="lighting.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_s.h">

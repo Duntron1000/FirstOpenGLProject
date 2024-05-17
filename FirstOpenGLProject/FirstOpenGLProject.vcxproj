@@ -152,6 +152,10 @@
     <ClInclude Include="shader_s.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lighting.frag" />
+    <None Include="lighting.vert" />
+    <None Include="lightSource.frag" />
+    <None Include="lightSource.vert" />
     <None Include="Orange.frag" />
     <None Include="Shader.vert" />
     <None Include="Yellow.frag" />

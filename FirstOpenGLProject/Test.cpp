@@ -1,13 +1,16 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include "shader_s.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "C:\Users\pjbru\OneDrive\Desktop\stb_image.h"
+
 #include <glm-1.0.1/glm/glm.hpp>
 #include <glm-1.0.1/glm/gtc/matrix_transform.hpp>
 #include <glm-1.0.1/glm/gtc/type_ptr.hpp>
-#include "camera.h";
+#define STB_IMAGE_IMPLEMENTATION
+#include "C:\Users\pjbru\OneDrive\Desktop\stb_image.h"
+
+#include "shader_s.h"
+#include "camera.h"
+
+#include <iostream>
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -32,6 +35,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// position of the light
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 
 int main()
 {
@@ -49,6 +55,10 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -56,19 +66,21 @@ int main()
 		return -1;
 	}
 
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// z-buffer
+	glEnable(GL_DEPTH_TEST);
 
 	// print out the maximum number of vertex attributes supported by my hardware
+	/*
 	int nrAttributes;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+	*/
 
 	// Create Shader Objects
-	Shader yellowShader("Shader.vert", "Yellow.frag");
-	Shader orangeShader("Shader.vert", "Orange.frag");
+	//Shader yellowShader("Shader.vert", "Yellow.frag");
+	//Shader orangeShader("Shader.vert", "Orange.frag");
+	Shader lightingShader("lighting.vert", "lighting.frag");
+	Shader lightSourceShader("lightSource.vert", "lightSource.frag");
 
 	// Set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -86,50 +98,50 @@ int main()
 	*/
 
 	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 0.0f,*/
+		 0.5f, -0.5f, -0.5f,  /*1.0f, 0.0f,*/
+		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 0.0f,*/
 
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 1.0f,*/
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 1.0f,*/
+		-0.5f,  0.5f,  0.5f,  /*0.0f, 1.0f,*/
+		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		-0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		-0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		 0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		 0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		 0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		 0.5f, -0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		-0.5f,  0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f*/
 	};
 
+	/*
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
@@ -147,27 +159,31 @@ int main()
 		0, 1, 3, // first triangle 
 		1, 2, 3  // second triangle 
 	};
+	*/
 
 
-	unsigned int VBO, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
+	unsigned int VBO, cubeVAO;
+	glGenVertexArrays(1, &cubeVAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attribure(s)
-	// Start setup 
-	glBindVertexArray(VAO);
+	//glGenBuffers(1, &EBO);
 
 	// Bind VBO and send verticies to the graphics card 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attribure(s)
+	// Start setup 
+	glBindVertexArray(cubeVAO);
+
+
+	/*
 	// Bind EBO and send indicies to the graphics card
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+	*/
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// color attribute
@@ -175,10 +191,20 @@ int main()
 	//glEnableVertexAttribArray(1);
 
 	// texture attribute 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	// glEnableVertexAttribArray(2);
+
+	unsigned int lightCubeVAO;
+	glGenVertexArrays(1, &lightCubeVAO);
+	glBindVertexArray(lightCubeVAO);
+	// bind the same VBO because it is the same shape
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// set the vertex attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// create texture object
+	/*
 	unsigned int texture1, texture2;
 	glGenTextures(1, &texture1);
 	glGenTextures(1, &texture2);
@@ -222,12 +248,11 @@ int main()
 	stbi_image_free(data);
 
 
-	yellowShader.use();
-	yellowShader.setInt("texture1", 0);
-	yellowShader.setInt("texture2", 1);
+	//yellowShader.use();
+	//yellowShader.setInt("texture1", 0);
+	//yellowShader.setInt("texture2", 1);
+	*/
 
-	// z-buffer
-	glEnable(GL_DEPTH_TEST);
 
 	// Draw loop
 	while (!glfwWindowShouldClose(window))
@@ -244,49 +269,74 @@ int main()
 
 		// render
 		// ------
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		lightingShader.use();
+		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 		// Toggle wireframe mode
 		// ---------------------
+		/*
 		if (wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 		else {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
+		*/
 
 		// vind textures on corresponding texture units
+		/*
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
+		*/
 
 		// activate shader
-		yellowShader.setFloat("mixer", mixer);
+		//yellowShader.setFloat("mixer", mixer);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		yellowShader.setMat4("projection", projection);
-
+		//float aspect = (float)SCR_WIDTH / SCR_HEIGHT;
+		//glm::mat4 projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
-		yellowShader.setMat4("view", view);
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
 
-		// render boxes
+		// world transformation
+		glm::mat4 model = glm::mat4(1.0f);
+		lightingShader.setMat4("model", model);
+
+		// render cube 
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		/*
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightingShader.setMat4("model", model);
+
 		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++) {
-			// calculate the model matrix for each object and pass it to shader before drawing 
-			glm::mat4 model = glm::mat4(1.0f); // make sure to initialize martix to identity matrix first
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			if (i % 3 == 0)
-				angle = glfwGetTime() * 20.0f;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			yellowShader.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		*/
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-	
+
+		// render light source
+		lightSourceShader.use();
+		lightSourceShader.setMat4("projection", projection);
+		lightSourceShader.setMat4("view", view);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightSourceShader.setMat4("model", model);
+
+		//glBindVertexArray(lightVAO);
+		glBindVertexArray(lightCubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// glfw: swap buffers and poll IO events
@@ -297,7 +347,8 @@ int main()
 
 	// de-allocate all resources once they've outlived their purpose:
 	// --------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &cubeVAO);
+	glDeleteVertexArrays(1, &lightCubeVAO);
 	glDeleteBuffers(1, &VBO);
 
 	// glfw: terminate, clearing all previousely allocated GLFW resources
@@ -310,6 +361,8 @@ void proccessInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	/*
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && released) {
 		wireframe = !wireframe;
 		released = false;
@@ -323,6 +376,7 @@ void proccessInput(GLFWwindow* window)
 	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		mixer -= 0.01f;
 	}
+	*/
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.ProcessKeyboard(FORWARD, deltaTime);

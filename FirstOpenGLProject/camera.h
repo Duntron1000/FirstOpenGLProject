@@ -10,15 +10,20 @@ enum Camera_Movement {
 	FORWARD,
 	BACKWORD,
 	LEFT,
-	RIGHT
+	RIGHT, 
+	PITCHUP,
+	PITCHDOWN,
+	TURNLEFT,
+	TURNRIGHT
 };
 
 // Default camera values 
 const float YAW         = -90.0f;
 const float PITCH       = 0.0f;
 const float SPEED       = 2.5f;
-const float SENSITIVITY = 0.1f;
+const float SENSITIVITY = 0.01f;
 const float ZOOM        = 45.0f;
+const float OMEGA = 20.0f;
 
 
 // An abstract camera object that processes input and calculates the corresponding Euler Angles, Vectors and Matricies for use in OpenGL1
@@ -37,9 +42,10 @@ public:
 	float MovementSpeed;
 	float MouseSensitivity;
 	float Zoom;
+	float Omega;
 
 	// constructor with vectors
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM), Omega(OMEGA)
 	{
 		Position = position;
 		WorldUp = up;
@@ -74,7 +80,23 @@ public:
 			Position -= Right * velocity;
 		if (direction == RIGHT)
 			Position += Right * velocity;
+		if (direction == PITCHUP)
+			Pitch += Omega * deltaTime;
+		if (direction == PITCHDOWN)
+			Pitch -= Omega * deltaTime;
+		if (direction == TURNLEFT)
+			Yaw -= Omega * deltaTime;
+		if (direction == TURNRIGHT)
+			Yaw += Omega * deltaTime;
+
+		if (Pitch > 89.0f)
+			Pitch = 89.0f;
+		if (Pitch < -89.0f)
+			Pitch = -89.0f;
+
+		updateCameraVectors();
 	}
+		
 
 	// processes input received from a mouse input system. Expects the offset value in both the x and y direction.
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) {

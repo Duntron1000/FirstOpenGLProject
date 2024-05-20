@@ -26,7 +26,7 @@ bool released = true;
 float mixer = 0.2;
 
 // camera 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(1.0f, 2.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -98,49 +98,48 @@ int main()
 	*/
 
 	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 0.0f,*/
-		 0.5f, -0.5f, -0.5f,  /*1.0f, 0.0f,*/
-		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 0.0f,*/
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
-		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 1.0f,*/
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 1.0f,*/
-		-0.5f,  0.5f,  0.5f,  /*0.0f, 1.0f,*/
-		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-		-0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		-0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
-		-0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		 0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		 0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		 0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		 0.5f, -0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		 0.5f, -0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		-0.5f, -0.5f,  0.5f,  /*0.0f, 0.0f,*/
-		-0.5f, -0.5f, -0.5f,  /*0.0f, 1.0f,*/
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f,*/
-		 0.5f,  0.5f, -0.5f,  /*1.0f, 1.0f,*/
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		 0.5f,  0.5f,  0.5f,  /*1.0f, 0.0f,*/
-		-0.5f,  0.5f,  0.5f,  /*0.0f, 0.0f,*/
-		-0.5f,  0.5f, -0.5f,  /*0.0f, 1.0f*/
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 	};
-
 	/*
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -183,8 +182,11 @@ int main()
 	*/
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// color attribute
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -200,7 +202,7 @@ int main()
 	// bind the same VBO because it is the same shape
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// set the vertex attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// create texture object
@@ -273,8 +275,11 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightingShader.use();
-		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		//lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("objectColor", 0.0f, 0.2f, 1.0f);
 		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("lightPos", lightPos);
+		lightingShader.setVec3("viewPos", camera.Position);
 
 		// Toggle wireframe mode
 		// ---------------------
@@ -329,6 +334,7 @@ int main()
 		lightSourceShader.setMat4("projection", projection);
 		lightSourceShader.setMat4("view", view);
 		model = glm::mat4(1.0f);
+		lightPos = glm::vec3(2 * cos(glfwGetTime()), 2 * cos(glfwGetTime()), 2 * sin(glfwGetTime()));
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightSourceShader.setMat4("model", model);
@@ -386,6 +392,15 @@ void proccessInput(GLFWwindow* window)
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		camera.ProcessKeyboard(PITCHUP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		camera.ProcessKeyboard(PITCHDOWN, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		camera.ProcessKeyboard(TURNLEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		camera.ProcessKeyboard(TURNRIGHT, deltaTime);
+	
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
